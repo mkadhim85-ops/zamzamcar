@@ -24,6 +24,28 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
+/**
+ * Result of checking one car's MC status.
+ *
+ * Discriminated union: every variant has a literal `kind` field so TypeScript
+ * can narrow the type after a single check. This is more robust than `in`
+ * checks, which only narrow object shape — not field types.
+ */
+type CheckResult =
+  | {
+      kind: "ok";
+      stockNumber: string;
+      found: boolean;
+      approved: boolean;
+      issueCount: number;
+      topIssue: string | undefined;
+    }
+  | {
+      kind: "error";
+      stockNumber: string;
+      error: string;
+    };
+
 export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams;
   const stockNumber = params.get("stock");
@@ -70,11 +92,12 @@ async function buildSummary() {
   const eligible = inventory.filter(isFeedEligible);
   const sample = eligible.slice(0, 20);
 
-  const results = await Promise.all(
-    sample.map(async (car) => {
+  const results: CheckResult[] = await Promise.all(
+    sample.map(async (car): Promise<CheckResult> => {
       try {
         const status = await getProductStatus(car.stockNumber);
         return {
+          kind: "ok",
           stockNumber: car.stockNumber,
           found: status.found,
           approved:
@@ -86,6 +109,7 @@ async function buildSummary() {
         };
       } catch (err) {
         return {
+          kind: "error",
           stockNumber: car.stockNumber,
           error: err instanceof Error ? err.message : String(err),
         };
@@ -93,10 +117,12 @@ async function buildSummary() {
     })
   );
 
-  const found = results.filter((r) => "found" in r && r.found).length;
-  const approved = results.filter((r) => "approved" in r && r.approved).length;
+  // Each filter below uses the `kind` discriminator so TypeScript narrows
+  // the type correctly inside the predicate — no `possibly undefined` errors.
+  const found = results.filter((r) => r.kind === "ok" && r.found).length;
+  const approved = results.filter((r) => r.kind === "ok" && r.approved).length;
   const withIssues = results.filter(
-    (r) => "issueCount" in r && r.issueCount > 0
+    (r) => r.kind === "ok" && r.issueCount > 0
   ).length;
 
   return NextResponse.json({
