@@ -1,0 +1,88 @@
+@import "tailwindcss";
+
+/**
+ * ZAMZAM CARS — Design Tokens
+ *
+ * Tailwind v4 uses CSS variables defined in `@theme` for design tokens.
+ * These tokens generate utility classes automatically (e.g., `--color-brand-emerald`
+ * becomes `bg-brand-emerald`, `text-brand-emerald`, etc.)
+ */
+@theme {
+  /* Brand colors — Clean Trust palette */
+  --color-brand-emerald: #059669;
+  --color-brand-emerald-dark: #047857;
+  --color-brand-slate: #0f172a;
+
+  /* CarGurus deal rating colors — exact hex per CarGurus brand guidelines */
+  --color-deal-great: #00a061;
+  --color-deal-good: #16a34a;
+  --color-deal-fair: #eab308;
+
+  /* Title status colors */
+  --color-title-clean: #10b981;
+  --color-title-rebuilt: #f59e0b;
+  --color-title-salvage: #ef4444;
+
+  /* Custom fonts */
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
+
+  /* Animations */
+  --animate-fade-up: fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+/* Base styles */
+html {
+  scroll-behavior: smooth;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--color-slate-900);
+  background-color: white;
+}
+
+/* Focus styles for accessibility */
+*:focus-visible {
+  outline: 2px solid var(--color-brand-emerald);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Prevent layout shift on image load */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Selection color */
+::selection {
+  background-color: var(--color-brand-emerald);
+  color: white;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
