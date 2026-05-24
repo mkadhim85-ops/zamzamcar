@@ -1,9 +1,1 @@
-{
-  "_comment": "Cron disabled until DealerCenter credentials are configured. Uncomment when ready.",
-  "_crons_when_ready": [
-    {
-      "path": "/api/sync/dealercenter",
-      "schedule": "0,30 * * * *"
-    }
-  ]
-}
+{}
